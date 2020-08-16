@@ -3,141 +3,128 @@ const fs = require('fs');
 const events = require('events');
 const path = require('path');
 
+//launch event emitter
+const myEmitter = new events.EventEmitter();
+
 //write note and create new file
-createFile = (filePath, note) => {
-    fs.writeFile(filePath, note, (err)=>{
+createFile = (filename, note) => {
+    fs.writeFile(filename, note, (err)=>{
         if (err) throw err;
         else
         myEmitter.emit('create')
     })
 }
 
-//createFile('demo.js', 'testing')
-//create new directory
-newDirectory = (folder, err)=>{
-    fs.mkdir(folder, (err)=>{
-        if (err) throw err;
-        else
-        console.log(`created!`);
-    })
-}
-
-//move files into topics
-organizeFiles = (topic, file) => {
-    const currentPath = path.join(__dirname, file);
-    const newPath = path.join(__dirname, topic, file )
-    fs.rename(currentPath, newPath, (err)=>{
-        if (!fs.existsSync(newPath) || !fs.existsSync(file)){
-            fs.open(file, 'w+', (err)=>{
-                if (err) throw err
-                else
-                fs.mkdirSync(topic)
-            })
-        }
-        else
-        console.log(`${file} moved into ${topic} folder!`);
-        
-    })
-}
-
-
-//list all files in directory
-listDirectory = (filePath, err) => {
-    fs.readdir(filePath, (err, files) => { 
-        if (err) 
-          console.log(err); 
-        else { 
-          console.log(`List of files in ${filePath}:`); 
-          files.forEach(file => { 
-            console.log(file); 
-          }) 
-        } 
-      }) 
-}
-
-//read files
-readFile = (filePath, encoding, err)=>{
-    fs.readFile(filePath, encoding, (err, data)=>{
+//read note
+readNote = (filename, encoding)=>{
+    fs.readFile(filename, encoding, (err, data)=>{
         if (err) throw err;
         else console.log(data);
     })
 }
 
-//edit and update file
-editFile = (filePath, note, err)=>{
-    fs.appendFile(filePath, note, (err)=>{
+//edit and update note
+editFile = (filename, note)=>{
+    fs.appendFile(filename, note, (err)=>{
         if (err) throw err;
         else
-        console.log(`file updated successfully!`);
+        myEmitter.emit('edit', filename)
     })
 }
 
-//delete file
-deleteFile = (folder, file, err) => {
-    let filePath = path.join('.','/', folder, file)
-    fs.unlink(filePath, (err, loc)=>{
-        let loc = path.join('.','/', folder)
+//create new directory
+createFolder = (folder)=>{
+    fs.mkdir(folder, (err)=>{
         if (err) throw err;
-        else if (loc){
-            fs.unlink(folder, (err)=>{
-                if (err) throw err;
-                myEmitter.emit('last-folder')
-            })
-        }
-        else 
-        myEmitter.emit('delete')
-        
+        else
+        myEmitter.emit(`newFolder`, folder);
     })
 }
 
+//move files into topics
+categorizeFile = (folder, file) => {
+    const currentPath = path.join(__dirname, file);
+    const newPath = path.join(__dirname, folder, file )
+    fs.rename(currentPath, newPath, (err)=>{
+        if (err)
+        console.log(`file already exists! `);
+        else
+        myEmitter.emit('moved', filePath, file)
+    })
+}
 
-
+//list all notes in a topic
+listNotes = (folder) => {
+    fs.readdir(folder, (err, notes)=>{
+        if (err) throw err;
+        else
+        console.log(`List of files in ${folder}:`);
+        notes.forEach(note=>{
+            console.log(`${note}`);
+        })
+    })
+}
 
 //get summary
-noteSummary = (filePath) => {
+noteSummary = (filename) => {
     const file = readline.createInterface({
-        input: fs.createReadStream(filePath),
+        input: fs.createReadStream(filename),
         output: process.stdout,
         terminal: false
     })
     
     file.on('line', (line)=>{
-        myEmitter.emit('summary', line.slice(-5) )
+        myEmitter.emit('summary', line.slice(10) )
     })
 }
 
-const myEmitter = new events.EventEmitter();
-
-//edit and uodate note
-editFile = (filePath, note, err)=>{
-    fs.appendFile(filePath, note, (err)=>{
+//delete file
+deleteFile = (folder, file) => {
+    let filePath = path.join('.','/', folder, file)
+    fs.unlink(filePath, (err)=>{
         if (err) throw err;
-        else
-        myEmitter.emit('edit', note)
+        else 
+        myEmitter.emit('delete', file)
     })
+}
+
+//export functions
+module.exports = {
+    read:readNote,
+    move:categorizeFile,
+    summary:noteSummary,
+    allnotes:listNotes,
+    createfile:createFile,
+    createfolder:createFolder,
+    edit:editFile,
+    delete:deleteFile
 }
 
 //listeners
 myEmitter.on('create',()=>{
     console.log(`file created!`);
-    
 })
 
-myEmitter.on('edit', (note)=>{
-    console.log(`${note} was edited`);
+myEmitter.on('newFolder', (folder)=>{
+    console.log(`new folder ${folder.toUpperCase()} was created!`);
 })
 
-myEmitter.on('delete', ()=>{
-    console.log(`file deleted!`);
+myEmitter.on('edit', (filename)=>{
+    console.log(`${filename} was edited`);
+})
+
+myEmitter.on('moved', (filePath, file)=>{
+    console.log(`${file} moved into ${filePath}!`);
 })
 
 myEmitter.on('summary', (sum)=>{
     console.log(`summary: .....${sum}`);
 })
 
-myEmitter.on('last-folder',()=>{
-    console.log(`folder deleted`);
+myEmitter.on('delete', (file)=>{
+    console.log(`${file} was deleted!`);
 })
+
 
 
 
