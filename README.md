@@ -1,13 +1,11 @@
 ## Simple Note Taker
-This app helps you to record and organize your notes. Built with NodeJs core modules only.
+A CRUD app that helps organize your notes. Built with NodeJs core modules only, no dependencies.
 
 ## Features
-* Create note and save as file
-* Organize note into folders as topics
+* Create note and folder
+* Read note from folder
 * Update note
-* List all notes in a folder
-* Display a summary of the note
 * Delete note
 
 ## Run app
-Go to `tests.js` to run some tests.
+Start app with `server.js`
