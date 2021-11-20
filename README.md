@@ -1,5 +1,9 @@
 ## Simple Note Taker
-A CRUD app that helps organize your notes. Built with NodeJs core modules only, no dependencies.
+This is a CRUD API built on Nodejs core modules. I built this project to learn how CRUD operations work in Nodejs.
+
+## Run app
+`node server.js`
+Test the API with Postman or any other application used for API testing. 
 
 ## Features
 ### Create note and folder
@@ -11,5 +15,4 @@ A CRUD app that helps organize your notes. Built with NodeJs core modules only, 
 ### Delete note
 ![Delete note](https://github.com/pozadkey/simple-note-taker/blob/master/Screenshots/delete.PNG)
 
-## Run app
-Start app with `server.js`
+
