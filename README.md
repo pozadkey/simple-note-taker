@@ -1,5 +1,5 @@
 ## Simple Note Taker
-This is a CRUD API built on Nodejs core modules. I built this project to learn how CRUD operations work in Nodejs.
+This is a CRUD API built on Node.js core modules. I built this project to learn how CRUD operations work in Nodejs.
 
 ## Run app
 `node server.js`
